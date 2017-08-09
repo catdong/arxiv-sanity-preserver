@@ -33,7 +33,7 @@ def encode_feedparser_dict(d):
     return d
 
 def parse_arxiv_url(url):
-  """ 
+  """
   examples is http://arxiv.org/abs/1512.08756v2
   we want to extract the raw id and the version
   """
@@ -43,23 +43,17 @@ def parse_arxiv_url(url):
   assert len(parts) == 2, 'error parsing url ' + url
   return parts[0], int(parts[1])
 
-if __name__ == "__main__":
-
-  # parse input arguments
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--search-query', type=str,
-                      default='cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML',
-                      help='query used for arxiv API. See http://arxiv.org/help/api/user-manual#detailed_examples')
-  parser.add_argument('--start-index', type=int, default=0, help='0 = most recent API result')
-  parser.add_argument('--max-index', type=int, default=10000, help='upper bound on paper index we will fetch')
-  parser.add_argument('--results-per-iteration', type=int, default=100, help='passed to arxiv API')
-  parser.add_argument('--wait-time', type=float, default=5.0, help='lets be gentle to arxiv API (in number of seconds)')
-  parser.add_argument('--break-on-no-added', type=int, default=1, help='break out early if all returned query papers are already in db? 1=yes, 0=no')
-  args = parser.parse_args()
-
+def fetch_papers(
+        start_index=0,
+        max_index=10000,
+        results_per_iteration=100,
+        search_query='cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML',
+        break_on_no_added=1,
+        wait_time=5.0
+):
   # misc hardcoded variables
   base_url = 'http://export.arxiv.org/api/query?' # base api query url
-  print('Searching arXiv for %s' % (args.search_query, ))
+  print('Searching arXiv for %s' % (search_query, ))
 
   # lets load the existing database to memory
   try:
@@ -74,11 +68,11 @@ if __name__ == "__main__":
   # main loop where we fetch the new results
   print('database has %d entries at start' % (len(db), ))
   num_added_total = 0
-  for i in range(args.start_index, args.max_index, args.results_per_iteration):
+  for i in range(start_index, max_index, results_per_iteration):
 
-    print("Results %i - %i" % (i,i+args.results_per_iteration))
-    query = 'search_query=%s&sortBy=lastUpdatedDate&start=%i&max_results=%i' % (args.search_query,
-                                                         i, args.results_per_iteration)
+    print("Results %i - %i" % (i,i+results_per_iteration))
+    query = 'search_query=%s&sortBy=lastUpdatedDate&start=%i&max_results=%i' % (search_query,
+                                                         i, results_per_iteration)
     with urllib.request.urlopen(base_url+query) as url:
       response = url.read()
     parse = feedparser.parse(response)
@@ -110,15 +104,36 @@ if __name__ == "__main__":
       print(response)
       break
 
-    if num_added == 0 and args.break_on_no_added == 1:
+    if num_added == 0 and break_on_no_added == 1:
       print('No new papers were added. Assuming no new papers exist. Exiting.')
       break
 
-    print('Sleeping for %i seconds' % (args.wait_time , ))
-    time.sleep(args.wait_time + random.uniform(0, 3))
+    print('Sleeping for %i seconds' % (wait_time , ))
+    time.sleep(wait_time + random.uniform(0, 3))
 
   # save the database before we quit, if we found anything new
   if num_added_total > 0:
     print('Saving database with %d papers to %s' % (len(db), Config.db_path))
     safe_pickle_dump(db, Config.db_path)
+
+if __name__ == "__main__":
+
+  # parse input arguments
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--search-query', type=str,
+                      default='cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML',
+                      help='query used for arxiv API. See http://arxiv.org/help/api/user-manual#detailed_examples')
+  parser.add_argument('--start-index', type=int, default=0, help='0 = most recent API result')
+  parser.add_argument('--max-index', type=int, default=10000, help='upper bound on paper index we will fetch')
+  parser.add_argument('--results-per-iteration', type=int, default=100, help='passed to arxiv API')
+  parser.add_argument('--wait-time', type=float, default=5.0, help='lets be gentle to arxiv API (in number of seconds)')
+  parser.add_argument('--break-on-no-added', type=int, default=1, help='break out early if all returned query papers are already in db? 1=yes, 0=no')
+  args = parser.parse_args()
+  fetch_papers(
+    args.start_index,
+    args.max_index,
+    args.results_per_iteration,
+    args.search_query,
+    args.break_on_no_added,
+  )
 
