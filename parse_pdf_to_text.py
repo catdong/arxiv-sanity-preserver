@@ -36,6 +36,7 @@ def parse_pdf_to_text():
     txt_path = os.path.join(Config.txt_dir, txt_basename)
     cmd = "pdftotext %s %s" % (pdf_path, txt_path)
     os.system(cmd)
+    os.system('rm %s' % (pdf_path))
 
     print('%d/%d %s' % (i, len(files), cmd))
 

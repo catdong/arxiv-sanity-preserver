@@ -135,5 +135,6 @@ if __name__ == "__main__":
     args.results_per_iteration,
     args.search_query,
     args.break_on_no_added,
+    args.wait_time
   )
 
