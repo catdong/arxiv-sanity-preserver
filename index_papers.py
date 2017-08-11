@@ -10,9 +10,9 @@ import argparse
 
 from utils import Config
 
-def index_papers(categories, start_index, max_index):
+def index_papers(search_query, start_index, max_index):
   fetch_papers.fetch_papers(
-    search_query='cat:' + categories,
+    search_query=search_query,
     start_index=start_index,
     max_index=max_index
   )
@@ -48,8 +48,6 @@ def index_papers(categories, start_index, max_index):
         action.update(doc)
         bulk_actions.append(action)
 
-        # es.index(index='papers', doc_type='paper', id=pid, body=doc)
-
     else:
       print("could not find %s." % (txt_path, ))
 
@@ -60,9 +58,10 @@ if __name__ == "__main__":
 
   # parse input arguments
   parser = argparse.ArgumentParser()
-  parser.add_argument('--categories', type=str,
-                      default='cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML',
-                      help='query used for arxiv API. See http://arxiv.org/help/api/user-manual#detailed_examples')
+  parser.add_argument('--search_query', type=str,
+                      default='cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML',
+                      help='query used for arxiv API, e.g. "cat:cs.AI". Defaults to all CS papers.'
+                           'See http://arxiv.org/help/api/user-manual#detailed_examples')
   parser.add_argument('--start-index', type=int, default=0, help='0 = most recent API result')
   parser.add_argument('--max-index', type=int, default=10000, help='upper bound on paper index we will fetch')
   args = parser.parse_args()
