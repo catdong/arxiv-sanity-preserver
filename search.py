@@ -2,16 +2,14 @@ import argparse
 import json
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan
-
-MAX_SEARCHES = 10000
-RESUlTS_SIZE = 1000
+from utils import Config
 
 def search_papers(search_phrase):
   es = Elasticsearch([{
-    'host': '09f7307feaa362c1f38dec4fc8a9f1c2.us-west-1.aws.found.io',
-    'port': 9243,
+    'host': Config.host,
+    'port': Config.port,
     'use_ssl': True,
-    'http_auth': 'elastic:NO69sWlVJi2VGje4OxIQLqMY'
+    'http_auth': Config.http_auth
   }])
 
   query = {

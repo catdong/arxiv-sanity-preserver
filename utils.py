@@ -28,6 +28,11 @@ class Config(object):
     banned_path = 'banned.txt' # for twitter users who are banned
     tmp_dir = 'tmp'
 
+    # Elasticsearch / Elastic Cloud host login info
+    host = '09f7307feaa362c1f38dec4fc8a9f1c2.us-west-1.aws.found.io'
+    port = 9243
+    http_auth = 'elastic:NO69sWlVJi2VGje4OxIQLqMY'
+
 # Context managers for atomic writes courtesy of
 # http://stackoverflow.com/questions/2333872/atomic-writing-to-file-with-python
 @contextmanager
