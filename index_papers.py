@@ -39,6 +39,7 @@ def index_papers(search_query, start_index, max_index):
         txt = f.read()
         doc['full_text'] = txt
 
+        # Elasticsearch bulk index action
         action = {
           '_op_type': 'index',
           '_index': 'papers',
@@ -52,7 +53,7 @@ def index_papers(search_query, start_index, max_index):
       print("could not find %s." % (txt_path, ))
 
   print('Bulk indexing...')
-  print(bulk(es, bulk_actions, request_timeout=30))
+  print(bulk(es, bulk_actions, request_timeout=30)) # bulk index all docs
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()

@@ -36,7 +36,7 @@ def parse_pdf_to_text():
     txt_path = os.path.join(Config.txt_dir, txt_basename)
     cmd = "pdftotext %s %s" % (pdf_path, txt_path)
     os.system(cmd)
-    os.system('rm %s' % (pdf_path))
+    os.system('rm %s' % (pdf_path)) # delete the pdf file after converting it to text
 
     print('%d/%d %s' % (i, len(files), cmd))
 
