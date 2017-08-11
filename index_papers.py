@@ -11,11 +11,7 @@ import argparse
 from utils import Config
 
 def index_papers(search_query, start_index, max_index):
-  fetch_papers.fetch_papers(
-    search_query=search_query,
-    start_index=start_index,
-    max_index=max_index
-  )
+  fetch_papers.fetch_papers(search_query=search_query, start_index=start_index, max_index=max_index)
   download_pdfs.download_pdfs()
   parse_pdf_to_text.parse_pdf_to_text()
 
@@ -54,6 +50,8 @@ def index_papers(search_query, start_index, max_index):
 
   print('Bulk indexing...')
   print(bulk(es, bulk_actions, request_timeout=30)) # bulk index all docs
+  os.system('rm %s' % (os.path.join(Config.txt_dir, '*'))) # delete the text files after indexing
+  os.system('rm %s' % (Config.db_path)) # delete the database so we don't re-index the same PDFs next time
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()

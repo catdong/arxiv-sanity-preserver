@@ -42,7 +42,6 @@ def download_pdfs():
     print('%d/%d of %d downloaded ok.' % (numok, numtot, len(db)))
 
   print('final number of papers downloaded okay: %d/%d' % (numok, len(db)))
-  os.system('rm %s' % (Config.db_path)) # delete the database so we don't re-index the same PDFs next time
 
 if __name__ == "__main__":
   download_pdfs()
